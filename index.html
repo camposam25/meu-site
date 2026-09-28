@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playground de Criptografia & Modularização</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans antialiased">
+
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg border border-emerald-500/20">
+                    <i class="fa-solid fa-user-lock text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-white leading-tight">CriptoLab Python</h1>
+                    <p class="text-xs text-slate-400">Modularização & Manipulação de Caracteres</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 text-xs bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-full text-slate-300">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Modo Interativo Colab</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Coluna Esquerda: Controles de Entrada e Filtros -->
+        <section class="lg:col-span-5 space-y-6">
+            
+            <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 shadow-xl backdrop-blur-sm">
+                <label for="inputText" class="block text-sm font-semibold text-slate-200 mb-2 flex justify-between">
+                    <span><i class="fa-solid fa-key text-emerald-400 mr-2"></i>Senha / Texto de Entrada:</span>
+                    <span id="charCount" class="text-xs text-slate-400">0 chars</span>
+                </label>
+                <input 
+                    type="text" 
+                    id="inputText" 
+                    value="Marcelo123!" 
+                    placeholder="Digite a senha aqui..."
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-emerald-300 font-mono text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                    oninput="processCipher()"
+                />
+            </div>
+
+            <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-semibold text-slate-200 uppercase tracking-wider text-xs border-b border-slate-700 pb-2 flex items-center justify-between">
+                    <span><i class="fa-solid fa-sliders text-emerald-400 mr-2"></i>Regras de Tratamento (ifs)</span>
+                    <span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Personalizável</span>
+                </h2>
+
+                <!-- Regra: Minúsculas -->
+                <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/50 border border-slate-800">
+                    <div>
+                        <p class="text-sm font-medium text-slate-200">Minúsculas (a-z)</p>
+                        <p class="text-xs text-slate-400">Substituição por dicionário customizado</p>
+                    </div>
+                    <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Ativo</span>
+                </div>
+
+                <!-- Regra: Maiúsculas -->
+                <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/50 border border-slate-800">
+                    <div>
+                        <p class="text-sm font-medium text-slate-200">Maiúsculas (A-Z)</p>
+                        <p class="text-xs text-slate-400">Converte e aplica o dicionário em maiúsculas</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="handleUppercase" class="sr-only peer" checked onchange="processCipher()">
+                        <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                    </label>
+                </div>
+
+                <!-- Regra: Números -->
+                <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/50 border border-slate-800">
+                    <div>
+                        <p class="text-sm font-medium text-slate-200">Números (0-9)</p>
+                        <p class="text-xs text-slate-400">Mapeia dígitos usando substituição invertida</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="handleNumbers" class="sr-only peer" checked onchange="processCipher()">
+                        <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                    </label>
+                </div>
+
+                <!-- Exibição dos Dicionários -->
+                <div class="pt-2 text-xs space-y-2 font-mono text-slate-400">
+                    <div class="p-2 bg-slate-950 rounded border border-slate-800">
+                        <span class="text-emerald-400">dicionario_letras:</span> "qwertyuiopasdfghjklzxcvbnm"
+                    </div>
+                    <div class="p-2 bg-slate-950 rounded border border-slate-800">
+                        <span class="text-emerald-400">dicionario_numeros:</span> "9876543210"
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-emerald-950/30 border border-emerald-500/20 rounded-xl p-5 text-emerald-200 text-xs space-y-2">
+                <div class="font-bold text-sm text-emerald-400 flex items-center">
+                    <i class="fa-solid fa-lightbulb mr-2"></i> Conceito Chave: Deslocamento ASCII
+                </div>
+                <p class="leading-relaxed">
+                    O comando <code class="bg-emerald-900/50 text-emerald-300 px-1 rounded">ord(letra) - ord('a')</code> calcula a distância relativa entre a letra dada e o início do alfabeto ('a' = 97 em ASCII). Isso resulta em um índice numérico de 0 a 25 para acessar a posição no dicionário!
+                </p>
+            </div>
+
+        </section>
+
+        <!-- Coluna Direita: Resultados, Inspeção e Código Python Gerado -->
+        <section class="lg:col-span-7 space-y-6">
+            
+            <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 shadow-xl backdrop-blur-sm">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-sm font-semibold text-slate-200 uppercase tracking-wider flex items-center">
+                        <i class="fa-solid fa-lock text-emerald-400 mr-2"></i>Resultado Criptografado
+                    </h2>
+                    <button onclick="copyOutput()" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1 rounded-md transition flex items-center gap-1.5">
+                        <i class="fa-regular fa-copy"></i>
+                        <span id="copyBtnText">Copiar</span>
+                    </button>
+                </div>
+                <div id="cipherResult" class="p-4 bg-slate-950 border border-slate-800 rounded-lg text-xl font-mono text-emerald-400 font-bold tracking-wider break-all min-h-[60px] flex items-center">
+                    <!-- Conteúdo gerado dinamicamente -->
+                </div>
+            </div>
+
+            <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 shadow-xl">
+                <h3 class="text-sm font-semibold text-slate-200 mb-3 flex items-center">
+                    <i class="fa-solid fa-microscope text-emerald-400 mr-2"></i>
+                    Rastreamento do Laço (for + if/elif/else)
+                </h3>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-950/80 text-slate-400 font-mono border-b border-slate-700">
+                            <tr>
+                                <th class="p-2.5">Original</th>
+                                <th class="p-2.5">ASCII</th>
+                                <th class="p-2.5">Condição (if)</th>
+                                <th class="p-2.5">Cálculo Pos.</th>
+                                <th class="p-2.5">Criptografado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="traceTableBody" class="font-mono divide-y divide-slate-800/60">
+                            <!-- Inserido dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 shadow-xl">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm font-semibold text-slate-200 flex items-center">
+                        <i class="fa-brands fa-python text-emerald-400 mr-2"></i>
+                        Código Python Modularizado (Pronto para Colab)
+                    </h3>
+                    <button onclick="copyPythonCode()" class="text-xs bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600/30 border border-emerald-500/30 px-3 py-1 rounded-md transition flex items-center gap-1.5">
+                        <i class="fa-regular fa-copy"></i>
+                        <span id="copyPyBtnText">Copiar Python</span>
+                    </button>
+                </div>
+                <pre class="bg-slate-950 border border-slate-800 text-slate-300 p-4 rounded-lg text-xs font-mono overflow-x-auto leading-relaxed"><code id="pythonCodeBlock"># Gerando script Python...</code></pre>
+            </div>
+
+        </section>
+
+    </main>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playground de Criptografia & Modularização</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+…                        <span id="copyPyBtnText">Copiar Python</span>
+                    </button>
+                </div>
+                <pre class="bg-slate-950 border border-slate-800 text-slate-300 p-4 rounded-lg text-xs font-mono overflow-x-auto leading-relaxed"><code id="pythonCodeBlock"># Gerando script Python...</code></pre>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        const dicionarioLetras = "qwertyuiopasdfghjklzxcvbnm";
+        const dicionarioNumeros = "9876543210";
+
+        function processCipher() {
+            const input = document.getElementById("inputText").value;
+            const handleUppercase = document.getElementById("handleUppercase").checked;
+            const handleNumbers = document.getElementById("handleNumbers").checked;
+            
+            document.getElementById("charCount").innerText = `${input.length} chars`;
+
+            let output = "";
+            let traceRows = "";
+
+            for (let i = 0; i < input.length; i++) {
+                const char = input[i];
+                const asciiVal = char.charCodeAt(0);
+                let conditionMatched = "else";
+                let calcDetails = "N/A (Mantido)";
+                let outChar = char;
+
+                // Verifica se é letra minúscula (a-z)
+                if (char >= 'a' && char <= 'z') {
+                    conditionMatched = 'if "a" <= letra <= "z"';
+                    const pos = char.charCodeAt(0) - 'a'.charCodeAt(0);
+                    outChar = dicionarioLetras[pos];
+                    calcDetails = `ord('${char}') - ord('a') = ${pos}`;
+                }
+                // Verifica se é letra maiúscula (A-Z)
+                else if (handleUppercase && char >= 'A' && char <= 'Z') {
+                    conditionMatched = 'elif "A" <= letra <= "Z"';
+                    const lowerChar = char.toLowerCase();
+                    const pos = lowerChar.charCodeAt(0) - 'a'.charCodeAt(0);
+                    outChar = dicionarioLetras[pos].toUpperCase();
+                    calcDetails = `ord('${lowerChar}') - ord('a') = ${pos} (Caps)`;
+                }
+                // Verifica se é número (0-9)
+                else if (handleNumbers && char >= '0' && char <= '9') {
+                    conditionMatched = 'elif "0" <= letra <= "9"';
+                    const pos = char.charCodeAt(0) - '0'.charCodeAt(0);
+                    outChar = dicionarioNumeros[pos];
+                    calcDetails = `ord('${char}') - ord('0') = ${pos}`;
+                }
+                else {
+                    conditionMatched = 'else (Símbolo/Outro)';
+                    calcDetails = 'Inalterado';
+                    outChar = char;
+                }
+
+                output += outChar;
+
+                // Constrói linha da tabela
+                traceRows += `
+                    <tr class="hover:bg-slate-800/40 transition">
+                        <td class="p-2.5 font-bold text-slate-100">${char === ' ' ? '(espaço)' : char}</td>
+                        <td class="p-2.5 text-slate-400">${asciiVal}</td>
+                        <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] ${conditionMatched.startsWith('if') ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : conditionMatched.startsWith('elif') ? 'bg-sky-950 text-sky-400 border border-sky-800' : 'bg-slate-800 text-slate-400'}">${conditionMatched}</span></td>
+                        <td class="p-2.5 text-slate-400">${calcDetails}</td>
+                        <td class="p-2.5 font-bold text-emerald-400">${outChar === ' ' ? '(espaço)' : outChar}</td>
+                    </tr>
+                `;
+            }
+
+            // Atualiza Interface
+            document.getElementById("cipherResult").innerText = output || "(Vazio)";
+            document.getElementById("traceTableBody").innerHTML = traceRows || `<tr><td colspan="5" class="p-4 text-center text-slate-500">Digite algo no campo acima para inspecionar.</td></tr>`;
+
+            // Atualiza o bloco de código Python dinâmico
+            updatePythonCodeSnippet(handleUppercase, handleNumbers);
+        }
+
+        function updatePythonCodeSnippet(handleUppercase, handleNumbers) {
+            let pyCode = `dicionario_letras = "qwertyuiopasdfghjklzxcvbnm"\n`;
+            if (handleNumbers) {
+                pyCode += `dicionario_numeros = "9876543210"\n`;
+            }
+            pyCode += `\n`;
+            pyCode += `def codifica(senha):\n`;
+            pyCode += `    senha_criptografada = ""\n`;
+            pyCode += `    for letra in senha:\n`;
+            pyCode += `        # Verifica minúsculas\n`;
+            pyCode += `        if "a" <= letra <= "z":\n`;
+            pyCode += `            posicao = ord(letra) - ord("a")\n`;
+            pyCode += `            senha_criptografada += dicionario_letras[posicao]\n`;
+            
+            if (handleUppercase) {
+                pyCode += `        # Verifica maiúsculas\n`;
+                pyCode += `        elif "A" <= letra <= "Z":\n`;
+                pyCode += `            posicao = ord(letra.lower()) - ord("a")\n`;
+                pyCode += `            senha_criptografada += dicionario_letras[posicao].upper()\n`;
+            }
+
+            if (handleNumbers) {
+                pyCode += `        # Verifica dígitos\n`;
+                pyCode += `        elif "0" <= letra <= "9":\n`;
+                pyCode += `            posicao = ord(letra) - ord("0")\n`;
+                pyCode += `            senha_criptografada += dicionario_numeros[posicao]\n`;
+            }
+
+            pyCode += `        # Símbolos, espaços e outros caracteres entram direto\n`;
+            pyCode += `        else:\n`;
+            pyCode += `            senha_criptografada += letra\n`;
+            pyCode += `            \n`;
+            pyCode += `    return senha_criptografada\n\n`;
+            pyCode += `# Testando a função modularizada\n`;
+            pyCode += `senha = "${document.getElementById("inputText").value}"\n`;
+            pyCode += `print(codifica(senha))\n`;
+
+            document.getElementById("pythonCodeBlock").textContent = pyCode;
+        }
+
+        function copyOutput() {
+            const text = document.getElementById("cipherResult").innerText;
+            copyToClipboard(text);
+            const btn = document.getElementById("copyBtnText");
+            btn.innerText = "Copiado!";
+            setTimeout(() => btn.innerText = "Copiar", 2000);
+        }
+
+        function copyPythonCode() {
+            const text = document.getElementById("pythonCodeBlock").textContent;
+            copyToClipboard(text);
+            const btn = document.getElementById("copyPyBtnText");
+            btn.innerText = "Código Copiado!";
+            setTimeout(() => btn.innerText = "Copiar Python", 2000);
+        }
+
+        function copyToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text);
+            } else {
+                const textarea = document.createElement("textarea");
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand("copy");
+                document.body.removeChild(textarea);
+            }
+        }
+
+        // Inicializa ao carregar a página
+        window.addEventListener("DOMContentLoaded", processCipher);
+    </script>
+</body>
+</html>
